@@ -243,9 +243,10 @@ Let's take a closer look at our default changeset.
     |> validate_required([:name, :email, :bio, :number_of_pets])
   end
 ```
-Right now, we have two simple pieces to this model.
+Right now, we have transformations in our pipeline to this model.
 In the first call, we invoke `cast/3` to send in our parameters and which fields are required for validation.
 `cast/3` first takes a struct, then the parameters are the proposed considered updates, and the final field is the list of columns to be updated.
+`cast/3` also will only take fields that exist in the schema.
 Next, `validate_required/3` checks that this list of fields is present in the changeset that `cast/3` returns.
 By default with the generator, all fields are required.
 
@@ -285,7 +286,7 @@ iex(4)> changeset.errors
 
 It gives us the same list of fields that can't be blank that we got from the front end of our application.
 
-Let's make required pets optional.
+Let's make number_of_pets optional.
 In order to do this, we simply remove it from the list.
 
 ```elixir
@@ -294,7 +295,7 @@ In order to do this, we simply remove it from the list.
 
 Now either method of verification should tell us that only `name`, `email`, and `bio` can't be blank.
 
-What happens if we pass a key/value pair that is in neither defined in the schema or required?
+What happens if we pass a key/value pair that is in neither defined in the schema nor required?
 
 In a new `iex -S mix phoenix.server` session, we should alias our module again.
 
@@ -404,8 +405,7 @@ There are many more validations and transformations we can perform in a changese
 At this point, let's see how we can actually use Ecto in our application. Luckily, Phoenix gave us an example of this when we ran `mix phoenix.gen.html`, the `HelloPhoenix.UserController`.
 
 Let's work through the generated controller action by action to see how Ecto is used.
-
-Before we get to the first action, let's look at an important line at the top of the file.
+We can alias HelloPhoenix.User so that we can name our structs `%User{}` instead of `%HelloPhoenix.User{}`.
 
 ```elixir
 defmodule HelloPhoenix.UserController do
